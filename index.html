@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MPI Selami Makna</title>
+    <!-- Font Modern: Nunito -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* ========================
+           CSS VARIABLES & RESET
+        ======================== */
+        :root {
+            --primary: #8b5cf6;
+            --primary-light: #a78bfa;
+            --primary-dark: #6d28d9;
+            --secondary: #f59e0b;
+            --bg-color: #e2e8f0; /* Diubah ke abu-abu lembut untuk latar luar */
+            --card-bg: #f1f5f9; /* Abu-abu terang untuk kotak/kartu dalam */
+            --text-main: #334155;
+            --text-light: #64748b;
+            --white: #ffffff; /* Tetap dipertahankan untuk warna teks tombol */
+            --success: #10b981;
+            --success-dark: #059669;
+            --danger: #ef4444;
+            --danger-dark: #dc2626;
+            --shadow-soft: 0 10px 40px -10px rgba(139, 92, 246, 0.15);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Nunito', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body { background-color: var(--bg-color); color: var(--text-main); line-height: 1.6; overflow-x: hidden; padding-bottom: 80px; }
+
+        /* ========================
+           TYPOGRAPHY & UTILITIES
+        ======================== */
+        h1, h2, h3 { color: var(--primary-dark); font-weight: 800; margin-bottom: 1rem; }
+        p { margin-bottom: 1rem; font-size: 1.05rem; }
+        .text-center { text-align: center; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.4s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* ========================
+           APP BAR (TOP)
+        ======================== */
+        .app-bar {
+            background: rgba(241, 245, 249, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .nav-brand { color: var(--primary-dark); font-weight: 800; font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+        .nav-brand img { height: 35px; border-radius: 50%; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+
+        .controls { display: flex; gap: 0.8rem; }
+        .icon-btn {
+            background: #f1f5f9; border: none; color: var(--primary-dark);
+            width: 42px; height: 42px; border-radius: 14px; cursor: pointer;
+            display: flex; justify-content: center; align-items: center;
+            transition: var(--transition); font-size: 1.2rem;
+        }
+        .icon-btn:hover { background: #e2e8f0; transform: scale(1.05); }
+
+        /* ========================
+           DESKTOP / BOTTOM NAVIGATION
+        ======================== */
+        .nav-menu { display: flex; gap: 0.5rem; }
+        .nav-menu button {
+            background: transparent; border: none; color: var(--text-light);
+            font-size: 1.05rem; font-weight: 700; cursor: pointer; padding: 0.6rem 1.2rem;
+            border-radius: 20px; transition: var(--transition);
+        }
+        .nav-menu button:hover { background: rgba(139, 92, 246, 0.1); color: var(--primary); }
+        .nav-menu button.active { background: var(--primary); color: var(--white); box-shadow: 0 4px 10px rgba(139, 92, 246, 0.3); }
+
+        /* Mobile Bottom Nav */
+        .mobile-bottom-nav {
+            display: none; position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(241, 245, 249, 0.95); backdrop-filter: blur(10px);
+            border-top: 1px solid #e2e8f0; z-index: 100;
+            justify-content: space-around; padding: 0.5rem 0;
+            padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+        .mobile-nav-btn {
+            background: none; border: none; display: flex; flex-direction: column; align-items: center;
+            color: var(--text-light); font-size: 0.75rem; font-weight: 700; gap: 4px; padding: 0.5rem;
+            transition: var(--transition); width: 60px;
+        }
+        .mobile-nav-btn span.icon { font-size: 1.5rem; transition: transform 0.2s; }
+        .mobile-nav-btn.active { color: var(--primary); }
+        .mobile-nav-btn.active span.icon { transform: translateY(-3px) scale(1.1); }
+
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .mobile-bottom-nav { display: flex; }
+        }
+
+        /* ========================
+           MAIN CONTAINER & CARDS
+        ======================== */
+        main { max-width: 900px; margin: 2rem auto; padding: 0 1rem; min-height: 70vh; }
+        section { display: none; }
+        section.active { display: block; }
+
+        .card {
+            background: var(--card-bg); border-radius: var(--radius-lg);
+            padding: 2.5rem; box-shadow: var(--shadow-soft); margin-bottom: 2rem;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        /* Tombol Utama */
+        .btn-primary {
+            background: var(--primary); color: var(--white); border: none;
+            padding: 1rem 2rem; border-radius: var(--radius-md); font-size: 1.15rem; font-weight: 800;
+            cursor: pointer; display: inline-block; text-align: center;
+            box-shadow: 0 6px 0 var(--primary-dark); transition: transform 0.1s, box-shadow 0.1s;
+        }
+        .btn-primary:active { transform: translateY(6px); box-shadow: 0 0 0 var(--primary-dark); }
+        .btn-primary:hover { filter: brightness(1.1); }
+
+        /* ========================
+           BERANDA
+        ======================== */
+        #beranda .hero {
+            text-align: center; padding: 4rem 2rem;
+            background: linear-gradient(135deg, #f3e8ff 0%, var(--card-bg) 100%);
+            border: 2px dashed #d8b4fe;
+        }
+        .illustration-container {
+            width: 140px; height: 140px; margin: 0 auto 1.5rem;
+            border-radius: 50%; padding: 6px; background: var(--card-bg);
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.2);
+        }
+        .illustration-container img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        /* Form Identitas Modern */
+        .input-group { margin-bottom: 1rem; text-align: left; }
+        .input-group label { font-weight: 800; color: var(--text-main); display: block; margin-bottom: 0.4rem; font-size: 0.95rem;}
+        input[type="text"] {
+            width: 100%; padding: 1rem 1.2rem; border: 2px solid #e2e8f0; background: #f8fafc;
+            border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; transition: var(--transition);
+        }
+        input[type="text"]:focus { outline: none; border-color: var(--primary); background: var(--card-bg); box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
+
+        /* ========================
+           MATERI
+        ======================== */
+        .info-box { background: #e2e8f0; padding: 1.5rem; border-radius: var(--radius-md); margin-bottom: 1rem; }
+        .cerpen-box { 
+            background: var(--card-bg); padding: 2rem; border-radius: var(--radius-md); 
+            border: 2px solid #cbd5e1; font-size: 1.1rem; line-height: 1.9; color: #1e293b;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .highlight {
+            background: #fef08a; cursor: pointer; padding: 2px 6px; border-radius: 6px;
+            border-bottom: 2px solid #eab308; font-weight: 600; transition: var(--transition);
+        }
+        .highlight:hover { background: #fde047; transform: translateY(-2px); display: inline-block;}
+        
+        .tooltip {
+            position: absolute; background: var(--text-main); color: white; padding: 12px 18px;
+            border-radius: 12px; font-size: 0.95rem; font-weight: 600; z-index: 1000; display: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-width: 280px; line-height: 1.4;
+        }
+        .tooltip::after { 
+            content: ''; position: absolute; bottom: 100%; left: 20px;
+            border-width: 8px; border-style: solid; border-color: transparent transparent var(--text-main) transparent;
+        }
+
+        /* ========================
+           LATIHAN
+        ======================== */
+        .latihan-nav { display: flex; gap: 0.8rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap;}
+        .latihan-nav button {
+            padding: 0.8rem 1.5rem; border: 2px solid #cbd5e1; background: var(--card-bg);
+            color: var(--text-light); border-radius: var(--radius-md); cursor: pointer; font-weight: 700; transition: var(--transition);
+        }
+        .latihan-nav button.active { border-color: var(--primary); background: #f3e8ff; color: var(--primary-dark); }
+        
+        .latihan-content > div { display: none; }
+        .latihan-content > div.active { display: block; animation: fadeIn 0.4s; }
+
+        /* UI Soal Benar/Salah */
+        .tf-question { font-size: 1.25rem; margin-bottom: 2rem; text-align: center; font-weight: 800; min-height: 80px; display: flex; align-items: center; justify-content: center; color: var(--primary-dark);}
+        .tf-actions { display: flex; justify-content: center; gap: 1.5rem; }
+        
+        .btn-tf {
+            flex: 1; max-width: 180px; padding: 1.2rem; font-size: 1.2rem; font-weight: 800;
+            border-radius: var(--radius-md); cursor: pointer; background: var(--card-bg);
+            transition: all 0.1s; text-align: center; border: 2px solid #cbd5e1; box-shadow: 0 6px 0 #cbd5e1; color: var(--text-main);
+        }
+        .btn-tf:active:not(:disabled) { transform: translateY(6px); box-shadow: 0 0 0 transparent; }
+        
+        .btn-tf.benar { border-color: var(--success); color: var(--success-dark); box-shadow: 0 6px 0 var(--success);}
+        .btn-tf.benar:active:not(:disabled) { box-shadow: 0 0 0 transparent; }
+        
+        .btn-tf.salah { border-color: var(--danger); color: var(--danger-dark); box-shadow: 0 6px 0 var(--danger);}
+        .btn-tf.salah:active:not(:disabled) { box-shadow: 0 0 0 transparent; }
+
+        .btn-tf:disabled { opacity: 0.6; cursor: not-allowed; transform: translateY(6px); box-shadow: 0 0 0 transparent;}
+
+        .feedback { margin-top: 2rem; padding: 1.5rem; border-radius: var(--radius-md); text-align: center; display: none; font-size: 1.1rem;}
+        .feedback.success { background: #dcfce7; color: #065f46; border: 2px solid #34d399;}
+        .feedback.error { background: #fee2e2; color: #991b1b; border: 2px solid #f87171;}
+
+        /* Progress Bar Modern */
+        .progress-container { width: 100%; height: 12px; background: #e2e8f0; border-radius: 10px; overflow: hidden; margin-bottom: 1.5rem; }
+        .progress-bar { height: 100%; background: var(--success); width: 0%; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); border-radius: 10px;}
+
+        /* Matching */
+        .match-container { display: flex; gap: 1.5rem; justify-content: space-between; position: relative; }
+        #match-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+        .match-line { stroke: var(--success); stroke-width: 5; stroke-linecap: round; }
+        @media (max-width: 600px) { .match-container { flex-direction: column; gap: 1rem; } }
+        .match-col { flex: 1; display: flex; flex-direction: column; gap: 0.8rem; position: relative; z-index: 1; }
+        .match-item {
+            padding: 1rem; background: var(--card-bg); border: 2px solid #cbd5e1;
+            border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s;
+            text-align: center; user-select: none; font-size: 0.95rem; font-weight: 700; position: relative; z-index: 2;
+            box-shadow: 0 4px 0 #cbd5e1;
+        }
+        .match-item:active { transform: translateY(4px); box-shadow: 0 0 0 transparent; }
+        .match-item.selected { border-color: var(--primary); background: #f3e8ff; box-shadow: 0 4px 0 var(--primary); color: var(--primary-dark); }
+        .match-item.matched { background: var(--success); color: white; border-color: var(--success-dark); box-shadow: 0 0 0 transparent; transform: translateY(4px); pointer-events: none; }
+        .match-item.wrong { animation: shake 0.4s; background: #fee2e2; border-color: var(--danger); box-shadow: 0 4px 0 var(--danger); color: var(--danger-dark);}
+
+        /* Drag & Drop */
+        .dnd-wrapper { display: flex; gap: 1.5rem; align-items: flex-start; }
+        @media (max-width: 768px) { .dnd-wrapper { flex-direction: column; } }
+        .dnd-items { flex: 1.3; display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+        .drop-zones { flex: 1; display: flex; flex-direction: column; gap: 1rem; width: 100%; }
+        .drop-zone {
+            width: 100%; min-height: 200px; border: 3px dashed #cbd5e1;
+            border-radius: var(--radius-lg); display: flex; flex-direction: column; align-items: center;
+            padding: 1.5rem; background: #f8fafc; transition: var(--transition);
+        }
+        .drop-zone.dragover { background: #f3e8ff; border-color: var(--primary); transform: scale(1.02);}
+        .draggable {
+            background: var(--card-bg); padding: 0.8rem 1.2rem; border: 2px solid #cbd5e1;
+            border-radius: 20px; cursor: grab; font-size: 0.95rem; font-weight: 700;
+            user-select: none; touch-action: none; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 0.5rem;
+        }
+
+        /* ========================
+           REFLEKSI & PENGEMBANG
+        ======================== */
+        .check-item { background: var(--card-bg); padding: 1.2rem; border-radius: var(--radius-md); margin-bottom: 1rem; border: 2px solid #cbd5e1; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; transition: var(--transition); box-shadow: 0 4px 6px rgba(0,0,0,0.02);}
+        .check-item p { margin: 0; font-weight: 800; color: var(--text-main); flex: 1; min-width: 250px;}
+        .check-options { display: flex; gap: 0.8rem; }
+        .check-options label { cursor: pointer; user-select: none; }
+        .check-options input { display: none; }
+        .check-badge { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 25px; background: #f1f5f9; border: 2px solid transparent; font-weight: 800; transition: var(--transition); color: #64748b;}
+        .check-options input[value="yes"]:checked ~ .check-badge { background: #dcfce7; color: var(--success-dark); border-color: var(--success); transform: scale(1.05);}
+        .check-options input[value="no"]:checked ~ .check-badge { background: #fee2e2; color: var(--danger-dark); border-color: var(--danger); transform: scale(1.05);}
+
+        .dev-profile { display: flex; align-items: center; gap: 2rem; }
+        .dev-avatar { width: 110px; height: 110px; border-radius: 50%; overflow: hidden; border: 4px solid #d8b4fe; box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2); flex-shrink: 0;}
+        .dev-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        @media (max-width: 600px) { .dev-profile { flex-direction: column; text-align: center; } }
+
+        /* ========================
+           MODAL SKOR (SCORE UI)
+        ======================== */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px);
+            display: flex; justify-content: center; align-items: center;
+            z-index: 2000; opacity: 0; transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-content {
+            background: var(--card-bg); padding: 2.5rem; border-radius: var(--radius-lg);
+            text-align: center; max-width: 400px; width: 90%;
+            transform: scale(0.9); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        .score-display {
+            font-size: 4.5rem; font-weight: 800; color: var(--primary);
+            margin: 0.5rem 0; line-height: 1; text-shadow: 3px 3px 0px #e9d5ff;
+        }
+
+        /* CANVAS CONFETTI */
+        #confetti-canvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 9999; }
+    </style>
+</head>
+<body>
+
+    <!-- Confetti Canvas -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- SCORE MODAL POPUP -->
+    <div id="score-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h2 style="margin-bottom: 0;">Latihan Selesai! 🎉</h2>
+            <div class="score-display">
+                <span id="final-score">100</span>
+            </div>
+            <p id="modal-message" style="font-weight: 700; color: var(--text-light); margin-bottom: 2rem;">Luar biasa! Kamu memahami materi dengan sangat baik.</p>
+            <button class="btn-primary" style="width: 100%;" onclick="closeScoreModal()">Tutup & Lanjut</button>
+        </div>
+    </div>
+
+    <!-- APP BAR (TOP) -->
+    <div class="app-bar">
+        <div class="nav-brand">
+            <img src="https://imgur.com/ALzpVb1.png" alt="Ombak">
+            <span>MPI Selami Makna</span>
+        </div>
+        
+        <!-- Desktop Nav -->
+        <nav class="nav-menu" id="desktopNav">
+            <button class="active" onclick="navigateTo('beranda', this)">🏠 Beranda</button>
+            <button onclick="navigateTo('materi', this)">📖 Materi</button>
+            <button onclick="navigateTo('latihan', this)">✍️ Latihan</button>
+            <button onclick="navigateTo('refleksi', this)">💡 Refleksi</button>
+            <button onclick="navigateTo('pengembang', this)">👤 Profil</button>
+        </nav>
+
+        <div class="controls">
+            <button class="icon-btn" id="btnAudio" onclick="toggleAudio()" title="Toggle Audio">🔇</button>
+            <button class="icon-btn" id="btnFullscreen" onclick="toggleFullScreen()" title="Fullscreen">⛶</button>
+        </div>
+    </div>
+
+    <!-- MOBILE BOTTOM NAV -->
+    <div class="mobile-bottom-nav" id="mobileNav">
+        <button class="mobile-nav-btn active" onclick="navigateTo('beranda', this)" data-target="beranda">
+            <span class="icon">🏠</span><span>Beranda</span>
+        </button>
+        <button class="mobile-nav-btn" onclick="navigateTo('materi', this)" data-target="materi">
+            <span class="icon">📖</span><span>Materi</span>
+        </button>
+        <button class="mobile-nav-btn" onclick="navigateTo('latihan', this)" data-target="latihan">
+            <span class="icon">✍️</span><span>Latihan</span>
+        </button>
+        <button class="mobile-nav-btn" onclick="navigateTo('refleksi', this)" data-target="refleksi">
+            <span class="icon">💡</span><span>Refleksi</span>
+        </button>
+        <button class="mobile-nav-btn" onclick="navigateTo('pengembang', this)" data-target="pengembang">
+            <span class="icon">👤</span><span>Profil</span>
+        </button>
+    </div>
+
+    <!-- TOOLTIP UNTUK MATERI -->
+    <div id="tooltip" class="tooltip"></div>
+
+    <!-- MAIN CONTENT -->
+    <main>
+        
+        <!-- 1. BERANDA -->
+        <section id="beranda" class="active fade-in">
+            <div class="card hero">
+                <div class="illustration-container">
+                    <img src="https://imgur.com/ALzpVb1.png" alt="Gambar Ombak">
+                </div>
+                <h1 id="welcome-text">Selamat Datang di Lautan Kisah!</h1>
+                <p style="color: var(--text-light); max-width: 600px; margin: 0 auto 2rem; font-weight: 600;">
+                    Mari belajar menemukan rahasia di balik teks cerita pendek.<br>
+                    <strong>Tujuan:</strong> Mampu menemukan makna <em>tersurat</em> (jelas) dan <em>tersirat</em> (tersembunyi).
+                </p>
+
+                <!-- Form Identitas Siswa -->
+                <div id="student-form" style="max-width: 350px; margin: 0 auto 2.5rem; background: rgba(241,245,249,0.8); padding: 2rem; border-radius: var(--radius-lg); box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.3);">
+                    <div class="input-group">
+                        <label for="student-name">Nama Lengkap</label>
+                        <input type="text" id="student-name" placeholder="Ketik namamu di sini...">
+                    </div>
+                    <div class="input-group">
+                        <label for="student-class">Kelas</label>
+                        <input type="text" id="student-class" placeholder="Contoh: VII-A">
+                    </div>
+                    <p id="form-error" style="color: var(--danger); font-size: 0.95rem; font-weight: 800; display: none; text-align: center; margin: 1rem 0 0;">⚠️ Isi Nama & Kelasmu dulu ya!</p>
+                </div>
+
+                <button class="btn-primary" onclick="startLearning()">Mulai Belajar 🚀</button>
+            </div>
+        </section>
+
+        <!-- 2. MATERI -->
+        <section id="materi">
+            <div class="card fade-in">
+                <h2>Apa itu Makna Tersurat dan Tersirat?</h2>
+                <p>Pengarang cerpen sering menyampaikan pesan dengan dua cara. Memahami keduanya adalah kunci untuk menikmati cerita.</p>
+                
+                <div style="display: flex; gap: 1.5rem; margin-bottom: 2.5rem; flex-wrap: wrap;">
+                    <div style="flex: 1; min-width: 250px; padding: 1.5rem; background: #eff6ff; border-radius: var(--radius-md); border: 2px solid #bfdbfe;">
+                        <h3 style="color: #1d4ed8; display: flex; align-items: center; gap: 8px;">🔍 Makna Tersurat</h3>
+                        <p style="font-size: 0.95rem; font-weight: 600;">Makna yang tertulis <strong>jelas & langsung</strong>.</p>
+                        <ul style="margin-left: 1.5rem; font-size: 0.9rem; color: #1e40af; font-weight: 600;">
+                            <li>Fakta, tindakan fisik, atau latar.</li>
+                            <li><em>Ibarat melihat batu karang di saat air surut, wujudnya terlihat jelas.</em></li>
+                        </ul>
+                    </div>
+                    <div style="flex: 1; min-width: 250px; padding: 1.5rem; background: #fefce8; border-radius: var(--radius-md); border: 2px solid #fef08a;">
+                        <h3 style="color: #a16207; display: flex; align-items: center; gap: 8px;">🕵️ Makna Tersirat</h3>
+                        <p style="font-size: 0.95rem; font-weight: 600;">Makna yang <strong>tersembunyi</strong> atau disimpulkan.</p>
+                        <ul style="margin-left: 1.5rem; font-size: 0.9rem; color: #854d0e; font-weight: 600;">
+                            <li>Sifat tokoh, suasana hati, atau pesan.</li>
+                            <li><em>Ibarat mencari mutiara, kamu harus menyelam lebih dalam.</em></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <h3 style="margin-bottom: 0.5rem; font-size: 1.1rem;">💡 Tips Menemukan Makna Tersirat</h3>
+                    <p style="font-size: 0.95rem; font-weight: 600; margin: 0; color: var(--text-light);">
+                        Perhatikan: <strong>1) Gestur tubuh tokoh</strong> (misal: meremas tangan = gugup), <strong>2) Nada dialog</strong>, <strong>3) Suasana alam</strong> yang mewakili perasaan tokoh.
+                    </p>
+                </div>
+
+                <h3 style="margin-top: 2.5rem;">Coba Berlatih: Klik Teks Kuning!</h3>
+                <p style="color: var(--text-light); font-weight: 600;">Cerpen: "Menanti Layar di Ujung Tanjung"</p>
+                
+                <div class="cerpen-box">
+                    <p style="margin-bottom: 1rem;">
+                        <span class="highlight" data-meaning="Tersurat: Latar waktu dan suasana di pantai yang nyata.">Angin sore berhembus membawa bau garam yang pekat.</span> 
+                        Di bawah pohon kelapa, Mak Ijah berdiri mematung. <span class="highlight" data-meaning="Tersirat: Mak Ijah sangat gelisah dan cemas memikirkan keselamatan suaminya yang sedang melaut.">Pandangannya kosong menembus ombak yang makin ganas, kedua tangannya meremas ujung kerudung.</span>
+                    </p>
+                    <p style="margin-bottom: 1rem;">
+                        <span class="highlight" data-meaning="Tersurat: Menjelaskan kondisi cuaca yang memburuk secara langsung.">Di ufuk barat, awan hitam pekat mulai berkumpul.</span> 
+                        Danu kecil, anak laki-laki Mak Ijah, mendongak sambil menarik baju ibunya. 
+                        <span class="highlight" data-meaning="Tersirat: Danu masih polos dan optimis, belum menyadari bahaya badai.">"Mak, Bapak pasti pulang bawa ikan besar kan? Danu lapar," celotehnya dengan mata berbinar.</span>
+                    </p>
+                    <p>
+                        Tiba-tiba terdengar deru mesin dari balik kabut. 
+                        <span class="highlight" data-meaning="Tersurat: Mendeskripsikan secara jelas wujud fisik perahu.">Sebuah perahu kayu dengan cat biru tampak membelah ombak dengan susah payah.</span> 
+                        Melihat sosok bertopi caping di kemudi, air mata Mak Ijah tumpah. 
+                        <span class="highlight" data-meaning="Tersirat: Mak Ijah sangat lega dan bersyukur suaminya selamat.">Tanpa mempedulikan gaunnya kotor, ia langsung bersujud di atas pasir basah.</span>
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. LATIHAN -->
+        <section id="latihan">
+            <div class="card fade-in">
+                <h2>Latihan Pemahaman</h2>
+                
+                <div class="latihan-nav">
+                    <button class="active" onclick="switchLatihan('lat1', this)">1. Kuis Cepat</button>
+                    <button onclick="switchLatihan('lat2', this)">2. Tarik Garis</button>
+                    <button onclick="switchLatihan('lat3', this)">3. Drag & Drop</button>
+                </div>
+
+                <div class="latihan-content">
+                    
+                    <!-- Latihan 1: Benar Salah -->
+                    <div id="lat1" class="active">
+                        <div class="progress-container"><div class="progress-bar" id="tf-progress"></div></div>
+                        <h3 style="text-align: center;">Soal <span id="tf-current">1</span> / <span id="tf-total">10</span></h3>
+                        
+                        <div id="tf-container" style="background: var(--card-bg); padding: 2.5rem; border-radius: var(--radius-lg); border: 2px solid #cbd5e1; margin-top: 1rem; box-shadow: 0 10px 20px rgba(0,0,0,0.02);">
+                            
+                            <div class="tf-question" id="tf-text">Memuat pertanyaan...</div>
+                            
+                            <div class="tf-actions">
+                                <button class="btn-tf benar" onclick="checkTF(true)">BENAR</button>
+                                <button class="btn-tf salah" onclick="checkTF(false)">SALAH</button>
+                            </div>
+                            
+                            <div id="tf-feedback" class="feedback"></div>
+                            
+                            <div class="text-center" style="margin-top: 2rem;">
+                                <button id="btn-next-tf" class="btn-primary hidden" style="width: 100%;" onclick="nextTF()">Lanjut ➔</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latihan 2: Mencocokkan -->
+                    <div id="lat2">
+                        <div class="progress-container"><div class="progress-bar" id="match-progress"></div></div>
+                        <h3>Pasangkan Kutipan & Makna</h3>
+                        <p style="font-weight: 600; color: var(--text-light); text-align: center; margin-bottom: 2rem;">Sentuh kutipan kiri, lalu sentuh maknanya di kanan.</p>
+                        
+                        <div class="match-container" id="match-container">
+                            <svg id="match-lines"></svg>
+                            <div class="match-col" id="match-left">
+                                <div class="match-item" data-id="1">"Wajahnya pucat pasi melihat ombak besar."</div>
+                                <div class="match-item" data-id="2">"Matahari bersinar terik menyengat."</div>
+                                <div class="match-item" data-id="3">"Nelayan itu menatap tajam mengepalkan tangan."</div>
+                                <div class="match-item" data-id="4">"Tangan keriputnya bergetar menerima koin itu."</div>
+                                <div class="match-item" data-id="5">"Aroma ikan asin memenuhi pekarangan."</div>
+                                <div class="match-item" data-id="6">"Ia memalingkan wajah berjalan cepat menjauh."</div>
+                                <div class="match-item" data-id="7">"Pasir putih membentang luas di pantai."</div>
+                                <div class="match-item" data-id="8">"Bocah itu melompat kegirangan."</div>
+                                <div class="match-item" data-id="9">"Langit mendadak gelap tertutup awan hitam."</div>
+                                <div class="match-item" data-id="10">"Ibu menghela napas panjang melihat tangkapan."</div>
+                            </div>
+                            <div class="match-col" id="match-right">
+                                <div class="match-item" data-target="5">Tersurat (Aroma Lingkungan)</div>
+                                <div class="match-item" data-target="2">Tersurat (Cuaca Panas)</div>
+                                <div class="match-item" data-target="8">Tersirat (Sangat Bahagia)</div>
+                                <div class="match-item" data-target="1">Tersirat (Sangat Ketakutan)</div>
+                                <div class="match-item" data-target="9">Tersurat (Tanda Akan Badai)</div>
+                                <div class="match-item" data-target="3">Tersirat (Marah/Dendam)</div>
+                                <div class="match-item" data-target="10">Tersirat (Kecewa dan Sedih)</div>
+                                <div class="match-item" data-target="4">Tersirat (Terharu/Lemah)</div>
+                                <div class="match-item" data-target="7">Tersurat (Pemandangan Alam)</div>
+                                <div class="match-item" data-target="6">Tersirat (Menghindari Sesuatu)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Latihan 3: Drag & Drop -->
+                    <div id="lat3">
+                        <h3>Kelompokkan Kutipan</h3>
+                        <p style="font-weight: 600; color: var(--text-light); text-align: center; margin-bottom: 2rem;">Sentuh kotak putih, lalu sentuh area Tersurat/Tersirat.</p>
+                        
+                        <div class="dnd-wrapper">
+                            <div class="dnd-items" id="draggables">
+                                <div class="draggable" draggable="true" data-type="tersirat">"Istri nelayan mondar-mandir meremas daster."</div>
+                                <div class="draggable" draggable="true" data-type="tersurat">"Ayah membeli jaring di tempat pelelangan."</div>
+                                <div class="draggable" draggable="true" data-type="tersirat">"Angin mendadak dingin menusuk tulang."</div>
+                                <div class="draggable" draggable="true" data-type="tersurat">"Perahu melaju membelah ombak."</div>
+                                <div class="draggable" draggable="true" data-type="tersirat">"Ia menelan ludah saat ditanya tangkapan hari ini."</div>
+                                <div class="draggable" draggable="true" data-type="tersurat">"Lampu mercusuar menyala terang."</div>
+                                <div class="draggable" draggable="true" data-type="tersirat">"Mata tua kakek berkaca-kaca memandangi jangkar."</div>
+                                <div class="draggable" draggable="true" data-type="tersurat">"Burung camar beterbangan di atas perahu."</div>
+                                <div class="draggable" draggable="true" data-type="tersurat">"Bau amis tercium pekat di dermaga."</div>
+                                <div class="draggable" draggable="true" data-type="tersirat">"Gadis kecil menyembunyikan wajahnya di balik tubuh ibu."</div>
+                            </div>
+
+                            <div class="drop-zones">
+                                <div class="drop-zone" data-type="tersurat">
+                                    <h3 style="color: #0369a1; background: #e0f2fe; padding: 0.5rem 1.5rem; border-radius: 20px;">Tersurat</h3>
+                                </div>
+                                <div class="drop-zone" data-type="tersirat">
+                                    <h3 style="color: #a16207; background: #fef08a; padding: 0.5rem 1.5rem; border-radius: 20px;">Tersirat</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. REFLEKSI -->
+        <section id="refleksi">
+            <div class="card fade-in">
+                <h2 class="text-center">Refleksi Belajar</h2>
+                <p class="text-center" style="font-weight: 600; margin-bottom: 2rem;">Berikan centang sesuai apa yang kamu rasakan!</p>
+                
+                <div class="checklist-container">
+                    <div class="check-item">
+                        <p>1. Saya sudah memahami perbedaan makna tersurat dan tersirat.</p>
+                        <div class="check-options">
+                            <label><input type="radio" name="ref1" value="yes"><span class="check-badge">✅ Ya</span></label>
+                            <label><input type="radio" name="ref1" value="no"><span class="check-badge">❌ Belum</span></label>
+                        </div>
+                    </div>
+                    <div class="check-item">
+                        <p>2. Saya bisa menemukan makna tersurat dari sebuah kalimat.</p>
+                        <div class="check-options">
+                            <label><input type="radio" name="ref2" value="yes"><span class="check-badge">✅ Ya</span></label>
+                            <label><input type="radio" name="ref2" value="no"><span class="check-badge">❌ Belum</span></label>
+                        </div>
+                    </div>
+                    <div class="check-item">
+                        <p>3. Saya bisa menyimpulkan makna tersirat dari tingkah laku tokoh.</p>
+                        <div class="check-options">
+                            <label><input type="radio" name="ref3" value="yes"><span class="check-badge">✅ Ya</span></label>
+                            <label><input type="radio" name="ref3" value="no"><span class="check-badge">❌ Belum</span></label>
+                        </div>
+                    </div>
+                    <div class="check-item">
+                        <p>4. Saya sudah menguasai tujuan pembelajaran hari ini dan siap mempraktikkannya di pertemuan selanjutnya.</p>
+                        <div class="check-options">
+                            <label><input type="radio" name="ref4" value="yes"><span class="check-badge">✅ Ya</span></label>
+                            <label><input type="radio" name="ref4" value="no"><span class="check-badge">❌ Belum</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn-primary" style="width: 100%; max-width: 300px;" onclick="saveRefleksi()">💾 Simpan Data</button>
+                    <p id="save-notif" style="color: var(--success-dark); font-weight: 800; margin-top: 1rem; opacity: 0; transition: opacity 0.5s;">Jawaban Berhasil Disimpan! 🎉</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. PENGEMBANG -->
+        <section id="pengembang">
+            <div class="card fade-in text-center">
+                <h2>Profil Pengembang</h2>
+                <div class="dev-profile" style="background: #faf5ff; padding: 2rem; border-radius: var(--radius-lg); border: 2px solid #e9d5ff;">
+                    <div class="dev-avatar">
+                        <img src="https://imgur.com/FwlueCQ.png" alt="Foto Bu Wulan Widari Endah">
+                    </div>
+                    <div style="text-align: left;">
+                        <h3 style="margin-bottom: 0.2rem;">Bu Wulan Widari Endah</h3>
+                        <p style="color: var(--primary); font-weight: 800; font-size: 1.1rem; margin-bottom: 1rem;">Guru Bahasa Indonesia SMPN 3 Cilegon</p>
+                        <p style="font-size: 0.95rem; color: var(--text-main);">Aplikasi ini dikembangkan untuk memfasilitasi pembelajaran interaktif materi Teks Cerita Pendek (Cerpen) bertema kehidupan pesisir. Dirancang dengan penuh dedikasi agar pengalaman belajar siswa menjadi lebih bermakna dan menyenangkan.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         JAVASCRIPT LOGIC
+    =========================================== -->
+    <script>
+        /* --- Audio Synthesizer --- */
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let isAudioEnabled = false;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playTone(freq, type, duration, vol = 0.1) {
+            if (!isAudioEnabled || !audioCtx) return;
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const sfx = {
+            click: () => playTone(600, 'sine', 0.05, 0.1),
+            correct: () => { playTone(500, 'sine', 0.1, 0.1); setTimeout(() => playTone(800, 'sine', 0.15, 0.1), 100); },
+            wrong: () => { playTone(300, 'sawtooth', 0.1, 0.1); setTimeout(() => playTone(200, 'sawtooth', 0.2, 0.1), 100); },
+            cheer: () => { 
+                if(!isAudioEnabled) return;
+                let t = 0;
+                let intv = setInterval(() => {
+                    playTone(400 + (Math.random()*400), 'sine', 0.1, 0.05);
+                    t++; if(t>10) clearInterval(intv);
+                }, 50);
+            }
+        };
+
+        function toggleAudio() {
+            initAudio();
+            isAudioEnabled = !isAudioEnabled;
+            const btn = document.getElementById('btnAudio');
+            btn.textContent = isAudioEnabled ? '🔊' : '🔇';
+            if(isAudioEnabled) sfx.click();
+        }
+
+        function toggleFullScreen() {
+            sfx.click();
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => console.log(err));
+            } else if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+
+        /* --- Navigation Logic --- */
+        function navigateTo(pageId, btnElement) {
+            sfx.click();
+            document.querySelectorAll('main > section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('#desktopNav button').forEach(btn => btn.classList.remove('active'));
+            const dBtn = document.querySelector(`#desktopNav button[onclick*="${pageId}"]`);
+            if(dBtn) dBtn.classList.add('active');
+
+            document.querySelectorAll('#mobileNav button').forEach(btn => btn.classList.remove('active'));
+            const mBtn = document.querySelector(`#mobileNav button[data-target="${pageId}"]`);
+            if(mBtn) mBtn.classList.add('active');
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startLearning() {
+            initAudio();
+            const nameInput = document.getElementById('student-name').value.trim();
+            const classInput = document.getElementById('student-class').value.trim();
+            const errorText = document.getElementById('form-error');
+
+            if (!nameInput || !classInput) {
+                errorText.style.display = 'block';
+                sfx.wrong();
+                const formDiv = document.getElementById('student-form');
+                formDiv.style.animation = 'shake 0.4s';
+                setTimeout(() => { formDiv.style.animation = ''; }, 400);
+                return;
+            }
+
+            errorText.style.display = 'none';
+            localStorage.setItem('cerpen_student_name', nameInput);
+            localStorage.setItem('cerpen_student_class', classInput);
+            document.getElementById('welcome-text').innerHTML = `Halo, ${nameInput}! 👋`;
+            
+            navigateTo('materi');
+        }
+
+        /* --- Materi: Tooltip --- */
+        const tooltip = document.getElementById('tooltip');
+        let tooltipTimeout;
+
+        document.querySelectorAll('.highlight').forEach(el => {
+            const showTooltip = (e) => {
+                clearTimeout(tooltipTimeout);
+                tooltip.innerHTML = e.target.getAttribute('data-meaning');
+                tooltip.style.display = 'block';
+                
+                const rect = e.target.getBoundingClientRect();
+                tooltip.style.top = (rect.bottom + window.scrollY + 12) + 'px';
+                
+                let leftPos = rect.left + window.scrollX;
+                if (leftPos + 280 > window.innerWidth) leftPos = window.innerWidth - 300;
+                tooltip.style.left = Math.max(10, leftPos) + 'px';
+
+                if (e.type === 'click') {
+                    sfx.click();
+                    tooltipTimeout = setTimeout(() => { tooltip.style.display = 'none'; }, 4000);
+                }
+            };
+            el.addEventListener('mouseenter', showTooltip);
+            el.addEventListener('mouseleave', () => { tooltipTimeout = setTimeout(() => { tooltip.style.display = 'none'; }, 200); });
+            el.addEventListener('click', showTooltip);
+        });
+
+        /* --- SCORE MODAL LOGIC --- */
+        function showScoreModal(score) {
+            const modal = document.getElementById('score-modal');
+            document.getElementById('final-score').textContent = score;
+            const msg = document.getElementById('modal-message');
+            
+            if(score >= 80) {
+                msg.textContent = "Luar biasa! Kamu sangat hebat! 🌟";
+                fireConfetti(); sfx.cheer();
+            } else if(score >= 60) {
+                msg.textContent = "Bagus! Terus tingkatkan belajarmu ya! 👍";
+            } else {
+                msg.textContent = "Jangan menyerah, ayo baca materinya lagi! 💪";
+            }
+            
+            modal.classList.add('show');
+        }
+
+        function closeScoreModal() {
+            sfx.click();
+            document.getElementById('score-modal').classList.remove('show');
+        }
+
+        /* --- Latihan Navigation --- */
+        function switchLatihan(latId, btnElement) {
+            sfx.click();
+            document.querySelectorAll('.latihan-content > div').forEach(div => div.classList.remove('active'));
+            document.getElementById(latId).classList.add('active');
+            document.querySelectorAll('.latihan-nav button').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            if(latId === 'lat2') { setTimeout(redrawLines, 100); }
+        }
+
+        /* --- Latihan 1: True/False --- */
+        const tfData = [
+            { q: "Makna tersurat adalah makna yang tertulis nyata pada kalimat.", a: true, exp: "Tepat! Tersurat berarti nyata." },
+            { q: "'Nelayan menundukkan kepala memegang jaring robek' secara tersurat berarti putus asa.", a: false, exp: "Salah! Kalimat itu mendeskripsikan tindakan fisik. 'Putus asa' adalah makna tersiratnya." },
+            { q: "Makna tersirat butuh pemahaman konteks pembaca.", a: true, exp: "Benar! Kita harus memahami cerita di baliknya." },
+            { q: "Kalimat 'Perahu dicat merah' mengandung makna tersirat.", a: false, exp: "Salah! Itu adalah fakta fisik (Tersurat)." },
+            { q: "'Menatap kosong dengan mata berkaca-kaca', tersiratnya adalah sedih.", a: true, exp: "Benar! Itu gestur kesedihan." },
+            { q: "'Ombak bergulung setinggi 2 meter' makna tersuratnya adalah cuaca buruk.", a: true, exp: "Tepat! Kalimat itu memberitahu fakta." },
+            { q: "Makna tersirat tidak penting dalam cerpen.", a: false, exp: "Salah! Justru inti emosi ada di sana." },
+            { q: "'Tersenyum lebar melihat layar perahu' tersiratnya lega/bahagia.", a: true, exp: "Benar! Senyum tanda bahagia." },
+            { q: "Makna tersurat bersembunyi di perumpamaan.", a: false, exp: "Salah! Yang bersembunyi adalah Tersirat." },
+            { q: "'Jaring ditarik susah payah karena penuh ikan' tersuratnya tangkapan banyak.", a: true, exp: "Tepat! Ditulis secara gamblang." }
+        ];
+        let currentTf = 0;
+        let scoreTf = 0;
+
+        function updateProgress() {
+            const pct = ((currentTf) / tfData.length) * 100;
+            document.getElementById('tf-progress').style.width = pct + '%';
+        }
+
+        function loadTF() {
+            updateProgress();
+            document.getElementById('tf-text').textContent = tfData[currentTf].q;
+            document.getElementById('tf-current').textContent = currentTf + 1;
+            document.getElementById('tf-feedback').style.display = 'none';
+            document.getElementById('btn-next-tf').classList.add('hidden');
+            document.querySelectorAll('.btn-tf').forEach(btn => btn.disabled = false);
+        }
+
+        function checkTF(answer) {
+            document.querySelectorAll('.btn-tf').forEach(btn => btn.disabled = true);
+            const feedbackEl = document.getElementById('tf-feedback');
+            feedbackEl.style.display = 'block';
+            
+            if (answer === tfData[currentTf].a) {
+                sfx.correct(); scoreTf++;
+                feedbackEl.className = 'feedback success';
+                feedbackEl.innerHTML = "🎉 <strong>Benar!</strong><br>" + tfData[currentTf].exp;
+            } else {
+                sfx.wrong();
+                feedbackEl.className = 'feedback error';
+                feedbackEl.innerHTML = "❌ <strong>Kurang Tepat.</strong><br>" + tfData[currentTf].exp;
+            }
+
+            if (currentTf < tfData.length - 1) {
+                document.getElementById('btn-next-tf').classList.remove('hidden');
+            } else {
+                document.getElementById('tf-progress').style.width = '100%';
+                
+                // Show Score Modal
+                const finalScore = scoreTf * 10;
+                setTimeout(() => showScoreModal(finalScore), 500);
+
+                document.getElementById('btn-next-tf').classList.remove('hidden');
+                document.getElementById('btn-next-tf').textContent = `Ulangi Latihan 1`;
+                document.getElementById('btn-next-tf').onclick = () => { currentTf = 0; scoreTf = 0; loadTF(); document.getElementById('btn-next-tf').textContent = "Lanjut ➔"; document.getElementById('btn-next-tf').onclick = nextTF; };
+            }
+        }
+
+        function nextTF() { sfx.click(); currentTf++; loadTF(); }
+        loadTF();
+
+        /* --- Latihan 2: Matching --- */
+        let activeLeft = null;
+        let matchedCount = 0;
+        let mistakesMatch = 0; // Track mistakes for scoring
+        let matchedPairs = []; 
+        const leftItems = document.querySelectorAll('#match-left .match-item');
+        const rightItems = document.querySelectorAll('#match-right .match-item');
+        const matchContainer = document.getElementById('match-container');
+        const svgLines = document.getElementById('match-lines');
+
+        function drawLine(el1, el2) {
+            const cRect = matchContainer.getBoundingClientRect();
+            const r1 = el1.getBoundingClientRect();
+            const r2 = el2.getBoundingClientRect();
+
+            const x1 = r1.left + (r1.width / 2) - cRect.left;
+            const y1 = r1.top + (r1.height / 2) - cRect.top;
+            const x2 = r2.left + (r2.width / 2) - cRect.left;
+            const y2 = r2.top + (r2.height / 2) - cRect.top;
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2); line.setAttribute("y2", y2);
+            line.setAttribute("class", "match-line");
+            
+            const length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            line.style.strokeDasharray = length;
+            line.style.strokeDashoffset = length;
+
+            svgLines.appendChild(line);
+            line.getBoundingClientRect();
+            line.style.transition = 'stroke-dashoffset 0.4s ease-out';
+            line.style.strokeDashoffset = '0';
+        }
+
+        function redrawLines() {
+            svgLines.innerHTML = '';
+            matchedPairs.forEach(p => drawLine(p.left, p.right));
+        }
+        window.addEventListener('resize', redrawLines);
+
+        leftItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if(item.classList.contains('matched')) return;
+                sfx.click();
+                leftItems.forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+                activeLeft = item;
+            });
+        });
+
+        rightItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if(!activeLeft || item.classList.contains('matched')) return;
+                const targetId = item.getAttribute('data-target');
+                const leftId = activeLeft.getAttribute('data-id');
+
+                if (targetId === leftId) {
+                    sfx.correct();
+                    activeLeft.classList.remove('selected');
+                    activeLeft.classList.add('matched');
+                    item.classList.add('matched');
+                    
+                    drawLine(activeLeft, item);
+                    matchedPairs.push({left: activeLeft, right: item});
+                    activeLeft = null;
+                    matchedCount++;
+                    
+                    document.getElementById('match-progress').style.width = (matchedCount*10) + '%';
+
+                    if(matchedCount === 10) {
+                        // Kalkulasi Skor Akhir Latihan 2
+                        let finalScore2 = Math.max(0, 100 - (mistakesMatch * 5));
+                        setTimeout(() => showScoreModal(finalScore2), 800);
+                    }
+                } else {
+                    sfx.wrong();
+                    mistakesMatch++; // Kurangi poin jika salah
+                    item.classList.remove('wrong');
+                    void item.offsetWidth; 
+                    item.classList.add('wrong');
+                }
+            });
+        });
+
+        /* --- Latihan 3: Drag & Drop --- */
+        const draggables = document.querySelectorAll('.draggable');
+        const dropZones = document.querySelectorAll('.drop-zone');
+        let selectedDraggable = null;
+        let mistakesDrop = 0; // Track mistakes for scoring
+
+        draggables.forEach(draggable => {
+            draggable.addEventListener('dragstart', () => { sfx.click(); draggable.classList.add('dragging'); });
+            draggable.addEventListener('dragend', () => { draggable.classList.remove('dragging'); });
+            draggable.addEventListener('click', () => {
+                if(draggable.parentElement.classList.contains('drop-zone')) return; 
+                sfx.click();
+                draggables.forEach(d => d.style.borderColor = '#e2e8f0');
+                draggable.style.borderColor = 'var(--secondary)';
+                selectedDraggable = draggable;
+            });
+        });
+
+        dropZones.forEach(zone => {
+            zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+            zone.addEventListener('dragleave', () => { zone.classList.remove('dragover'); });
+            zone.addEventListener('drop', e => {
+                e.preventDefault(); zone.classList.remove('dragover');
+                const draggable = document.querySelector('.dragging');
+                handleDrop(draggable, zone);
+            });
+            zone.addEventListener('click', () => {
+                if(selectedDraggable) {
+                    handleDrop(selectedDraggable, zone);
+                    selectedDraggable.style.borderColor = '#e2e8f0';
+                    selectedDraggable = null;
+                }
+            });
+        });
+
+        function handleDrop(item, zone) {
+            if(!item) return;
+            const expectedType = zone.getAttribute('data-type');
+            const itemType = item.getAttribute('data-type');
+
+            if (expectedType === itemType) {
+                sfx.correct();
+                zone.appendChild(item);
+                item.setAttribute('draggable', 'false');
+                item.style.borderColor = 'var(--success)';
+                item.style.background = '#dcfce7';
+                
+                // Jika semua berhasil dipindahkan
+                if(document.getElementById('draggables').children.length === 0) {
+                    let finalScore3 = Math.max(0, 100 - (mistakesDrop * 5));
+                    setTimeout(() => showScoreModal(finalScore3), 500);
+                }
+            } else {
+                sfx.wrong();
+                mistakesDrop++; // Kurangi poin jika salah letak
+                item.style.animation = 'shake 0.4s';
+                setTimeout(() => { item.style.animation = ''; }, 400);
+            }
+        }
+
+        /* --- Refleksi --- */
+        function loadRefleksi() {
+            for (let i = 1; i <= 4; i++) {
+                const savedValue = localStorage.getItem('cerpen_ref_' + i);
+                if (savedValue) {
+                    const radioBtn = document.querySelector(`input[name="ref${i}"][value="${savedValue}"]`);
+                    if (radioBtn) radioBtn.checked = true;
+                }
+            }
+        }
+
+        function saveRefleksi() {
+            sfx.click();
+            let filled = 0;
+            for (let i = 1; i <= 4; i++) {
+                const checkedRadio = document.querySelector(`input[name="ref${i}"]:checked`);
+                if (checkedRadio) {
+                    localStorage.setItem('cerpen_ref_' + i, checkedRadio.value);
+                    filled++;
+                }
+            }
+            if(filled === 4) fireConfetti();
+            const notif = document.getElementById('save-notif');
+            notif.style.opacity = '1';
+            setTimeout(() => { notif.style.opacity = '0'; }, 3000);
+        }
+
+        function loadStudentData() {
+            const savedName = localStorage.getItem('cerpen_student_name');
+            const savedClass = localStorage.getItem('cerpen_student_class');
+            if (savedName && savedClass) {
+                document.getElementById('student-name').value = savedName;
+                document.getElementById('student-class').value = savedClass;
+                document.getElementById('welcome-text').innerHTML = `Halo kembali, ${savedName}! 👋`;
+            }
+        }
+
+        /* --- CONFETTI SYSTEM --- */
+        let particles = [];
+        const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6'];
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettiAnimationId;
+
+        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function createParticles() {
+            for(let i=0; i<100; i++) {
+                particles.push({
+                    x: canvas.width/2, y: canvas.height/2 + 200,
+                    r: Math.random() * 6 + 4,
+                    dx: Math.random() * 20 - 10,
+                    dy: Math.random() * -15 - 5,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    tilt: Math.floor(Math.random() * 10) - 10,
+                    tiltAngleInc: (Math.random() * 0.07) + 0.05,
+                    tiltAngle: 0
+                });
+            }
+        }
+
+        function drawConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            let active = false;
+            particles.forEach((p, index) => {
+                p.tiltAngle += p.tiltAngleInc;
+                p.y += (Math.cos(p.tiltAngle) + 1 + p.r / 2) / 2;
+                p.x += Math.sin(p.tiltAngle) * 2;
+                p.dy += 0.1; 
+                p.x += p.dx; p.y += p.dy;
+                
+                if (p.y <= canvas.height) active = true;
+
+                ctx.beginPath();
+                ctx.lineWidth = p.r;
+                ctx.strokeStyle = p.color;
+                ctx.moveTo(p.x + p.tilt + p.r, p.y);
+                ctx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+                ctx.stroke();
+            });
+
+            if(active) {
+                confettiAnimationId = requestAnimationFrame(drawConfetti);
+            } else {
+                particles = [];
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        function fireConfetti() {
+            cancelAnimationFrame(confettiAnimationId);
+            particles = [];
+            createParticles();
+            drawConfetti();
+        }
+
+        window.onload = () => {
+            loadStudentData();
+            loadRefleksi();
+        };
+
+    </script>
+</body>
+</html>
